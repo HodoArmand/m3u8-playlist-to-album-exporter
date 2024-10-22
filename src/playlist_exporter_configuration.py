@@ -66,12 +66,16 @@ class PlaylistExporterConfiguration:
             'add_ordering_prefix_to_filename': {
                 'type': 'boolean',
                 'nullable': True
+            },
+            'yaml_file_path': {
+                'type': 'string',
+                'nullable': True
             }
         }
 
         self._validator = Validator(schema)
 
-    def load_tuple(self, values: PlaylistExporterConfigurationValues):
+    def _set_config_from_tuple(self, values: PlaylistExporterConfigurationValues):
         """ Class prop initialization from named tuple. """
 
         self.album_name = values.album_name
@@ -81,46 +85,52 @@ class PlaylistExporterConfiguration:
 
         self._is_loaded = True
 
+    def _load_and_validate(self, config: dict):
+        """ Load the configuration values from a dict. """
+
+        try:
+            if not self._validator.validate(config):
+                validation_error_msg = f"Invalid configuration loaded. Validation errors: {self._validator.errors}"
+
+                raise EnvironmentError(validation_error_msg)
+
+            if config["playlist_file_path"] is not None and config["album_name"] is None:
+                config["album_name"] = get_filename_without_extension(config["playlist_file_path"])
+            if config["output_directory"] is None and config["album_name"] is None:
+                config["output_directory"] = os.path.join("output", os.path.abspath(get_filename_without_extension(config["playlist_file_path"])))
+            if config["output_directory"] is None and config["album_name"] is not None:
+                config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
+
+            config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] \
+                if config["add_ordering_prefix_to_filename"] is not None else True
+
+            config_tuple = PlaylistExporterConfigurationValues(
+                album_name=config["album_name"],
+                playlist_file_path=config["playlist_file_path"],
+                output_directory=config["output_directory"],
+                add_ordering_prefix_to_filename=config["add_ordering_prefix_to_filename"]
+            )
+
+            self._set_config_from_tuple(config_tuple)
+
+        except KeyError as e:
+            self._logger.error("Missing key in exporter configuration: %s", e)
+        except EnvironmentError as validation_error_msg:
+            self._logger.error(validation_error_msg)
+
     def load_yaml(self, yaml_abspath: str|PosixPath|WindowsPath):
         """ Read the config values from a yaml file. """
 
         self._logger.info("Loading configuration from .yaml file: %s", str(yaml_abspath))
+        config = None
         try:
-            config = None
             with open(yaml_abspath, 'r', encoding="utf-8") as file:
                 config = yaml.safe_load(file)
 
-            if not self._validator.validate(config):
-                self._logger.error("Invalid configuration loaded from .yaml.")
-                self._logger.error("Validation errors:\n %s", self._validator.errors)
-
-                raise EnvironmentError("Invalid configuration loaded from .yaml.")
-
-            try:
-                if config["playlist_file_path"] is not None and config["album_name"] is None:
-                    config["album_name"] = get_filename_without_extension(config["playlist_file_path"])
-                if config["output_directory"] is None and config["album_name"] is None:
-                    config["output_directory"] = os.path.join("output", os.path.abspath(get_filename_without_extension(config["playlist_file_path"])))
-                if config["output_directory"] is None and config["album_name"] is not None:
-                    config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
-
-                config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] \
-                    if config["add_ordering_prefix_to_filename"] is not None else True
-
-                config_tuple = PlaylistExporterConfigurationValues(
-                    album_name=config["album_name"],
-                    playlist_file_path=config["playlist_file_path"],
-                    output_directory=config["output_directory"],
-                    add_ordering_prefix_to_filename=config["add_ordering_prefix_to_filename"]
-                )
-
-                self.load_tuple(config_tuple)
-
-            except KeyError as e:
-                self._logger.error("Missing key in exporter configuration: %s", e)
-
         except Exception as e:
             self._logger.error("YAML file load error: %s", e)
+
+        self._load_and_validate(config)
 
     @staticmethod
     def get_args_parser() -> ArgumentParser:
@@ -138,29 +148,5 @@ class PlaylistExporterConfiguration:
     def load_argparse_namespace(self, config: Namespace):
         """ Read the config values from an argparse Namespace object when run in CLI mode. """
 
-        try:
-            if config.playlist_file_path is not None and config.album_name is None:
-                config.album_name = get_filename_without_extension(config.playlist_file_path)
-            if config.output_directory is None and config.album_name is None:
-                config.output_directory = os.path.join("output", os.path.abspath(get_filename_without_extension(config.playlist_file_path)))
-            if config.output_directory is None and config.album_name is not None:
-                config.output_directory = os.path.join("output", os.path.abspath(config.album_name))
-
-            config.add_ordering_prefix_to_filename = config.add_ordering_prefix_to_filename \
-                if config.add_ordering_prefix_to_filename is not None else True
-
-            config_tuple = PlaylistExporterConfigurationValues(
-                album_name=config.album_name,
-                playlist_file_path=config.playlist_file_path,
-                output_directory=config.output_directory,
-                add_ordering_prefix_to_filename=config.add_ordering_prefix_to_filename
-            )
-
-            self.load_tuple(config_tuple)
-
-        except KeyError as e:
-            self._logger.error("Missing key in exporter configuration: %s", e)
-        except TypeError:
-            self._logger.error("Missing or wrong argument given.")
-
-    # TODO: pull in Cerberus lib for schema validation, refactor this and the argparser part.
+        self._logger.info("Loading configuration from CLI args")
+        self._load_and_validate(vars(config))
