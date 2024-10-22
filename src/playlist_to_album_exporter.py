@@ -25,4 +25,3 @@ class PlaylistToAlbumExporter:
     def export_album(self):
         """ Export the loaded tracks as a new album to the target directory. """
         self._logger.info("Exporting Album...")
-        self._logger.info("Config: %s", self._config)

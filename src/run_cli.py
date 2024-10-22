@@ -31,6 +31,8 @@ def run_cli() -> int:
 
         return 1
 
+    logger.info("Configuration: %s", exporter_config)
+
     exporter = PlaylistToAlbumExporter(exporter_config)
     exporter.export_album()
 
