@@ -8,7 +8,7 @@ from playlist_to_album_exporter import PlaylistToAlbumExporter
 from playlist_exporter_configuration import PlaylistExporterConfiguration
 from utility.check_python_version import check_python_version
 
-def run_cli():
+def run_cli() -> int:
     """ Run the CLI API for the application """
 
     logging.basicConfig(level=logging.DEBUG)
@@ -22,11 +22,20 @@ def run_cli():
     try:
         yaml_file_abspath: str | WindowsPath | PosixPath = os.path.abspath(args.yaml_file_path)
         exporter_config.load_yaml(yaml_file_abspath)
-    except AttributeError:
+    except TypeError:
+        logger.info("No yaml file path argument given, loading configuration from CLI args...")
         exporter_config.load_argparse_namespace(args)
 
-    exporter = PlaylistToAlbumExporter(exporter_config)
-    exporter.export_album()
+    if exporter_config.is_loaded():
+
+        exporter = PlaylistToAlbumExporter(exporter_config)
+        exporter.export_album()
+
+        return 0
+
+    else:
+        logger.error("Configuration failed to load.")
+        return 1
 
 if __name__ == '__main__':
     run_cli()

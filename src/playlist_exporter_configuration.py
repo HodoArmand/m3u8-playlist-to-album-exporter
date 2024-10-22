@@ -22,6 +22,7 @@ class PlaylistExporterConfiguration:
     """ Class to hold and load the configuration values from code, yaml or cli args. """
 
     _logger: logging.Logger|None = None
+    _is_loaded: bool = False
     album_name: str|None = None
     playlist_file_path: str|None = None
     output_directory: str|None = None
@@ -38,6 +39,11 @@ class PlaylistExporterConfiguration:
                 add_ordering_prefix_to_filename: {self.add_ordering_prefix_to_filename}
                 """
 
+    def is_loaded(self):
+        """ is_configured prop getter """
+
+        return self._is_loaded
+
     def load_tuple(self, values: PlaylistExporterConfigurationValues):
         """ Class prop initialization from named tuple. """
 
@@ -45,6 +51,8 @@ class PlaylistExporterConfiguration:
         self.playlist_file_path = values.playlist_file_path
         self.output_directory = values.output_directory
         self.add_ordering_prefix_to_filename = values.add_ordering_prefix_to_filename
+
+        self._is_loaded = True
 
     def load_yaml(self, yaml_abspath: str|PosixPath|WindowsPath):
         """ Read the config values from a yaml file. """
@@ -117,5 +125,7 @@ class PlaylistExporterConfiguration:
 
         except KeyError as e:
             self._logger.error("Missing key in exporter configuration: %s", e)
+        except TypeError:
+            self._logger.error("Missing or wrong argument given.")
 
     # TODO: pull in Cerberus lib for schema validation, refactor this and the argparser part.
