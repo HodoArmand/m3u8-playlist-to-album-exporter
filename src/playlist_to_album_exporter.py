@@ -15,5 +15,6 @@ class PlaylistToAlbumExporter:
         self._config = config
 
     def export_album(self):
-        """  """
+        """ Export the loaded tracks as a new album to the target directory. """
+
 
