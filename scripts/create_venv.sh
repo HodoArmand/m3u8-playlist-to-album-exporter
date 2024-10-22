@@ -2,6 +2,6 @@
 
 cd ..
 pip install virtualenv
-virtualenv .venv-m3u8-playlist-to-album-exporter
-source venv/bin/activate
+virtualenv .venv_m3u8_playlist_to_album_exporter
+source .venv_m3u8_playlist_to_album_exporter/Scripts/activate
 pip install -r requirements.txt
