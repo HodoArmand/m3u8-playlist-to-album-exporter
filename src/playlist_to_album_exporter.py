@@ -1,7 +1,7 @@
 """ Main class of the .m3u8 playlist file to album exporter. """
 
 import logging
-from src.playlist_exporter_configuration import PlaylistExporterConfiguration
+from playlist_exporter_configuration import PlaylistExporterConfiguration
 
 
 class PlaylistToAlbumExporter:
@@ -16,5 +16,7 @@ class PlaylistToAlbumExporter:
 
     def export_album(self):
         """ Export the loaded tracks as a new album to the target directory. """
+        self._logger.info("Exporting Album...")
+        self._logger.info("Config: %s", self._config)
 
 

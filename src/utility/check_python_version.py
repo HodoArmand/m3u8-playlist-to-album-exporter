@@ -17,8 +17,10 @@ def check_python_version():
     }
     version_info = sys.version_info
 
-    min_version_str: str = str(required_minimum_version['major']) + str(required_minimum_version['minor']) + str(required_minimum_version['micro'])
-    sys_version_str: str = str(version_info)
+    min_version_str: str = str(required_minimum_version['major'])+"." \
+                           + str(required_minimum_version['minor'])+"."\
+                           + str(required_minimum_version['micro'])
+    sys_version_str: str = str(version_info.major)+"."+str(version_info.minor)+"."+str(version_info.micro)
 
     if version_info.major != required_minimum_version['major']:
         error_msg = f"""Python version error: Required python major version to run this tool is:
@@ -28,7 +30,8 @@ def check_python_version():
         raise EnvironmentError(error_msg)
 
     if version_info.minor < required_minimum_version['minor'] or version_info.micro < required_minimum_version['micro']:
-        error_msg = f"Python version error: Required minimum python version to run this tool is: {min_version_str}. This system is running: {sys_version_str}"
+        error_msg = f"""Python version error: Required minimum python version to run this tool is: {min_version_str}.
+                        This system is running: {sys_version_str}"""
         logger.error(error_msg)
 
         raise EnvironmentError(error_msg)

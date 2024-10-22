@@ -8,7 +8,7 @@ from typing import NamedTuple
 
 import yaml
 
-from src.utility.get_filename_without_extension import get_filename_without_extension
+from utility.get_filename_without_extension import get_filename_without_extension
 
 
 class PlaylistExporterConfigurationValues(NamedTuple):
@@ -29,6 +29,14 @@ class PlaylistExporterConfiguration:
 
     def __init__(self):
         self._logger = logging.getLogger("PlaylistExporterConfiguration")
+
+    def __str__(self):
+        return f"""
+                album_name: {self.album_name}
+                playlist_file_path: {self.playlist_file_path}
+                output_directory: {self.output_directory}
+                add_ordering_prefix_to_filename: {self.add_ordering_prefix_to_filename}
+                """
 
     def load_tuple(self, values: PlaylistExporterConfigurationValues):
         """ Class prop initialization from named tuple. """
