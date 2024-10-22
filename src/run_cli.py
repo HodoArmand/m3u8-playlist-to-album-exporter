@@ -4,9 +4,9 @@ import argparse
 from argparse import Namespace
 from pathlib import WindowsPath, PosixPath
 
-from src.M3u8_playlist_to_album_exporter import PlaylistToAlbumExporter
+from src.playlist_to_album_exporter import PlaylistToAlbumExporter
 from src.playlist_exporter_configuration import PlaylistExporterConfiguration
-from src.utility.python_version_checker import check_python_version
+from src.utility.check_python_version import check_python_version
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog=".m3u8 Album Exporter CLI utility", description = '')
