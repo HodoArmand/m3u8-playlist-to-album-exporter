@@ -43,30 +43,31 @@ class PlaylistExporterConfiguration:
         """ Read the config values from a yaml file. """
 
         try:
+            config = None
             with open(yaml_abspath, 'r', encoding="utf-8") as file:
                 config = yaml.safe_load(file)
 
-                try:
-                    if config["playlist_file_path"] is not None and config["album_name"] is None:
-                        config["album_name"] = get_filename_without_extension(config["playlist_file_path"])
-                    if config["output_directory"] is not None and config["album_name"] is None:
-                        config["output_directory"] = os.path.join("output", os.path.abspath(get_filename_without_extension(config["playlist_file_path"])))
-                    if config["output_directory"] is not None and config["album_name"] is not None:
-                        config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
+            try:
+                if config["playlist_file_path"] is not None and config["album_name"] is None:
+                    config["album_name"] = get_filename_without_extension(config["playlist_file_path"])
+                if config["output_directory"] is not None and config["album_name"] is None:
+                    config["output_directory"] = os.path.join("output", os.path.abspath(get_filename_without_extension(config["playlist_file_path"])))
+                if config["output_directory"] is not None and config["album_name"] is not None:
+                    config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
 
-                    config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] if config["add_ordering_prefix_to_filename"] is not None else True
+                config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] if config["add_ordering_prefix_to_filename"] is not None else True
 
-                    config_tuple = PlaylistExporterConfigurationValues(
-                        album_name=config["album_name"],
-                        playlist_file_path=config["playlist_file_path"],
-                        output_directory=config["output_directory"],
-                        add_ordering_prefix_to_filename=config["add_ordering_prefix_to_filename"]
-                    )
+                config_tuple = PlaylistExporterConfigurationValues(
+                    album_name=config["album_name"],
+                    playlist_file_path=config["playlist_file_path"],
+                    output_directory=config["output_directory"],
+                    add_ordering_prefix_to_filename=config["add_ordering_prefix_to_filename"]
+                )
 
-                    self.load_tuple(config_tuple)
+                self.load_tuple(config_tuple)
 
-                except KeyError as e:
-                    self._logger.error("Missing key in exporter configuration: %s", e)
+            except KeyError as e:
+                self._logger.error("Missing key in exporter configuration: %s", e)
 
         except Exception as e:
             self._logger.error("YAML file load error: %s", e)
