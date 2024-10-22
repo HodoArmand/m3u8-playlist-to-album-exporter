@@ -26,16 +26,16 @@ def run_cli() -> int:
         logger.info("No yaml file path argument given, loading configuration from CLI args...")
         exporter_config.load_argparse_namespace(args)
 
-    if exporter_config.is_loaded():
-
-        exporter = PlaylistToAlbumExporter(exporter_config)
-        exporter.export_album()
-
-        return 0
-
-    else:
+    if not exporter_config.is_loaded():
         logger.error("Configuration failed to load.")
+
         return 1
+
+    exporter = PlaylistToAlbumExporter(exporter_config)
+    exporter.export_album()
+
+    return 0
+
 
 if __name__ == '__main__':
     run_cli()

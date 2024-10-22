@@ -71,7 +71,8 @@ class PlaylistExporterConfiguration:
                 if config["output_directory"] is None and config["album_name"] is not None:
                     config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
 
-                config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] if config["add_ordering_prefix_to_filename"] is not None else True
+                config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] \
+                    if config["add_ordering_prefix_to_filename"] is not None else True
 
                 config_tuple = PlaylistExporterConfigurationValues(
                     album_name=config["album_name"],
@@ -112,7 +113,8 @@ class PlaylistExporterConfiguration:
             if config.output_directory is None and config.album_name is not None:
                 config.output_directory = os.path.join("output", os.path.abspath(config.album_name))
 
-            config.add_ordering_prefix_to_filename = config.add_ordering_prefix_to_filename if config.add_ordering_prefix_to_filename is not None else True
+            config.add_ordering_prefix_to_filename = config.add_ordering_prefix_to_filename \
+                if config.add_ordering_prefix_to_filename is not None else True
 
             config_tuple = PlaylistExporterConfigurationValues(
                 album_name=config.album_name,
