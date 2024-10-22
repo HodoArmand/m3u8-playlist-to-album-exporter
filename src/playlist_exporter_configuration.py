@@ -7,6 +7,7 @@ from pathlib import PosixPath, WindowsPath
 from typing import NamedTuple
 
 import yaml
+from cerberus import Validator
 
 from utility.get_filename_without_extension import get_filename_without_extension
 
@@ -21,8 +22,10 @@ class PlaylistExporterConfigurationValues(NamedTuple):
 class PlaylistExporterConfiguration:
     """ Class to hold and load the configuration values from code, yaml or cli args. """
 
-    _logger: logging.Logger|None = None
+    _logger: logging.Logger = None
+    _validator: Validator = None
     _is_loaded: bool = False
+
     album_name: str|None = None
     playlist_file_path: str|None = None
     output_directory: str|None = None
@@ -30,6 +33,7 @@ class PlaylistExporterConfiguration:
 
     def __init__(self):
         self._logger = logging.getLogger("PlaylistExporterConfiguration")
+        self._set_schema_validator()
 
     def __str__(self):
         return f"""
@@ -43,6 +47,29 @@ class PlaylistExporterConfiguration:
         """ is_configured prop getter """
 
         return self._is_loaded
+
+    def _set_schema_validator(self):
+        """ Set the configuration validator by schema. """
+        schema = {
+            'album_name': {
+                'type': 'string',
+                'nullable': True
+            },
+            'playlist_file_path': {
+                'type': 'string',
+                'required': True
+            },
+            'output_directory': {
+                'type': 'string',
+                'required': True
+            },
+            'add_ordering_prefix_to_filename': {
+                'type': 'boolean',
+                'nullable': True
+            }
+        }
+
+        self._validator = Validator(schema)
 
     def load_tuple(self, values: PlaylistExporterConfigurationValues):
         """ Class prop initialization from named tuple. """
@@ -62,6 +89,12 @@ class PlaylistExporterConfiguration:
             config = None
             with open(yaml_abspath, 'r', encoding="utf-8") as file:
                 config = yaml.safe_load(file)
+
+            if not self._validator.validate(config):
+                self._logger.error("Invalid configuration loaded from .yaml.")
+                self._logger.error("Validation errors:\n %s", self._validator.errors)
+
+                raise EnvironmentError("Invalid configuration loaded from .yaml.")
 
             try:
                 if config["playlist_file_path"] is not None and config["album_name"] is None:
