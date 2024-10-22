@@ -8,9 +8,11 @@ from playlist_to_album_exporter import PlaylistToAlbumExporter
 from playlist_exporter_configuration import PlaylistExporterConfiguration
 from utility.check_python_version import check_python_version
 
-if __name__ == '__main__':
+def run_cli():
+    """ Run the CLI API for the application """
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger("Playlist Exporter CLI Utility")
 
     check_python_version()
     exporter_config = PlaylistExporterConfiguration()
@@ -18,10 +20,13 @@ if __name__ == '__main__':
     args: Namespace = parser.parse_args()
 
     try:
-        yaml_file_abspath: str | WindowsPath | PosixPath = os.path.abspath(args.yaml)
+        yaml_file_abspath: str | WindowsPath | PosixPath = os.path.abspath(args.yaml_file_path)
         exporter_config.load_yaml(yaml_file_abspath)
     except AttributeError:
         exporter_config.load_argparse_namespace(args)
 
     exporter = PlaylistToAlbumExporter(exporter_config)
     exporter.export_album()
+
+if __name__ == '__main__':
+    run_cli()

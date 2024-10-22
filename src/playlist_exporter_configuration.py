@@ -41,7 +41,6 @@ class PlaylistExporterConfiguration:
     def load_tuple(self, values: PlaylistExporterConfigurationValues):
         """ Class prop initialization from named tuple. """
 
-        self._logger = logging.getLogger("PlaylistExporterConfiguration")
         self.album_name = values.album_name
         self.playlist_file_path = values.playlist_file_path
         self.output_directory = values.output_directory
@@ -50,6 +49,7 @@ class PlaylistExporterConfiguration:
     def load_yaml(self, yaml_abspath: str|PosixPath|WindowsPath):
         """ Read the config values from a yaml file. """
 
+        self._logger.info("Loading configuration from .yaml file: %s", str(yaml_abspath))
         try:
             config = None
             with open(yaml_abspath, 'r', encoding="utf-8") as file:
@@ -58,9 +58,9 @@ class PlaylistExporterConfiguration:
             try:
                 if config["playlist_file_path"] is not None and config["album_name"] is None:
                     config["album_name"] = get_filename_without_extension(config["playlist_file_path"])
-                if config["output_directory"] is not None and config["album_name"] is None:
+                if config["output_directory"] is None and config["album_name"] is None:
                     config["output_directory"] = os.path.join("output", os.path.abspath(get_filename_without_extension(config["playlist_file_path"])))
-                if config["output_directory"] is not None and config["album_name"] is not None:
+                if config["output_directory"] is None and config["album_name"] is not None:
                     config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
 
                 config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] if config["add_ordering_prefix_to_filename"] is not None else True
@@ -99,9 +99,9 @@ class PlaylistExporterConfiguration:
         try:
             if config.playlist_file_path is not None and config.album_name is None:
                 config.album_name = get_filename_without_extension(config.playlist_file_path)
-            if config.output_directory is not None and config.album_name is None:
+            if config.output_directory is None and config.album_name is None:
                 config.output_directory = os.path.join("output", os.path.abspath(get_filename_without_extension(config.playlist_file_path)))
-            if config.output_directory is not None and config.album_name is not None:
+            if config.output_directory is None and config.album_name is not None:
                 config.output_directory = os.path.join("output", os.path.abspath(config.album_name))
 
             config.add_ordering_prefix_to_filename = config.add_ordering_prefix_to_filename if config.add_ordering_prefix_to_filename is not None else True
