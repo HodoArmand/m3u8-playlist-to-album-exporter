@@ -30,6 +30,7 @@ class PlaylistExporterConfiguration:
     playlist_file_path: str|None = None
     output_directory: str|None = None
     add_ordering_prefix_to_filename: bool|None = True
+    # TODO: add configurable Artist metadata prop setter value for album tracks.
 
     def __init__(self):
         self._logger = logging.getLogger("PlaylistExporterConfiguration")
@@ -69,6 +70,10 @@ class PlaylistExporterConfiguration:
             },
             'yaml_file_path': {
                 'type': 'string',
+                'nullable': True
+            },
+            'debug': {
+                'type': 'boolean',
                 'nullable': True
             }
         }
@@ -142,6 +147,7 @@ class PlaylistExporterConfiguration:
         parser.add_argument('-pf', '--playlist_file_path', help='TODO: fill this')
         parser.add_argument('-out', '--output_directory', help='TODO: fill this')
         parser.add_argument('-opf', '--add_ordering_prefix_to_filename', help='TODO: fill this')
+        parser.add_argument('-d', '--debug', action='store_true', help='Enable debug level logging.')
 
         return parser
 

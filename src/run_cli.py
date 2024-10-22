@@ -13,14 +13,15 @@ from utility.check_python_version import check_python_version
 def run_cli() -> int:
     """ Run the CLI API for the application """
 
-    # coloredlogs.install(level='DEBUG', fmt='%(levelname)s: %(message)s')
-    coloredlogs.install(level='DEBUG', fmt='%(levelname)s|%(name)s: %(message)s')
-    logger = logging.getLogger("Playlist Exporter CLI Utility")
-
     check_python_version()
     exporter_config = PlaylistExporterConfiguration()
     parser: ArgumentParser = exporter_config.get_args_parser()
     args: Namespace = parser.parse_args()
+
+    log_level = 'Debug' if args.debug else 'Info'
+    args.debug = None
+    coloredlogs.install(level=log_level, fmt='%(levelname)s|%(name)s: %(message)s')
+    logger = logging.getLogger("Playlist Exporter CLI Utility")
 
     try:
         yaml_file_abspath: str | WindowsPath | PosixPath = os.path.abspath(args.yaml_file_path)
