@@ -9,11 +9,11 @@ import yaml
 class PlaylistExporterConfiguration:
     """ Class to hold and load the configuration values """
 
-    _logger: logging.Logger = None
-    album_name: str = ""
-    playlist_file_path = ""
-    output_directory = ""
-    add_ordering_prefix_to_filename = True
+    _logger: logging.Logger|None = None
+    album_name: str|None = None
+    playlist_file_path: str|None = None
+    output_directory: str|None = None
+    add_ordering_prefix_to_filename: bool|None = None
 
     def __init__(self):
         self._logger = logging.getLogger("PlaylistExporterConfiguration")
@@ -25,14 +25,28 @@ class PlaylistExporterConfiguration:
             with open(yaml_abspath, 'r', encoding="utf-8") as file:
                 exporter_configuration = yaml.safe_load(file)
 
-                self.album_name = exporter_configuration['album_name']
-                self.playlist_file_path = exporter_configuration['playlist_file_path']
-                self.output_directory = exporter_configuration['output_directory']
-                self.add_ordering_prefix_to_filename = exporter_configuration['add_ordering_prefix_to_filename']
+                try:
+                    self.album_name = exporter_configuration['album_name']
+                    self.playlist_file_path = exporter_configuration['playlist_file_path']
+                    self.output_directory = exporter_configuration['output_directory']
+                    self.add_ordering_prefix_to_filename = exporter_configuration['add_ordering_prefix_to_filename']
+                except KeyError as e:
+                    self._logger.error("Missing key in exporter configuration: %s", e)
+
+                # TODO: if no album name given, use the playlist filename as default.
 
         except Exception as e:
             self._logger.error("YAML file load error: %s", e)
 
     def load_argparse_namespace(self, args: Namespace):
         """ Read the config values from an argparse Namespace object when run in CLI mode. """
-        # TODO: this
+
+        try:
+            self.album_name = args.album_name
+            self.playlist_file_path = args.playlist_file_path
+            self.output_directory = args.output_directory
+            self.add_ordering_prefix_to_filename = args.add_ordering_prefix_to_filename if args.add_ordering_prefix_to_filename is not None else True
+        except KeyError as e:
+            self._logger.error("Missing key in exporter configuration: %s", e)
+
+    # TODO: pull in Cerberus lib for schema validation, refactor this and the argparser part.
