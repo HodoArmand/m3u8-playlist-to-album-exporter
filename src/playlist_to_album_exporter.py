@@ -63,6 +63,7 @@ class PlaylistToAlbumExporter:
         self._logger.info("Creating folder for album %s", self._config.album_name)
         try:
             os.makedirs(self._config.output_directory, exist_ok=True)
+            self._logger.info("Album folder created successfully.")
         except Exception as e:
             self._logger.error("Error when creating folder for album '%s' at '%s'\nerror:%s",
                                self._config.album_name,
@@ -71,14 +72,19 @@ class PlaylistToAlbumExporter:
 
         # TODO: parallelize this
         # TODO: add metadata setters
-        for track in self._playlist_parser.get_tracks():
+
+        tracks: list[Track] = self._playlist_parser.get_tracks()
+        tracks_len: int = len(tracks)
+        for track_index, track in enumerate(tracks):
             if not os.path.isfile(track.abs_file_path):
-                self._logger.error("Track file not found. Skipping:\n -Track: %s \n -uri: %s, ",
-                                  track.title,
-                                  track.abs_file_path)
+                self._logger.error("Track %s/%s file not found. Skipping:\n -Track: %s \n -filepath: %s, ",
+                                   track_index + 1,
+                                    tracks_len,
+                                    track.title,
+                                    track.abs_file_path)
                 self._stats.file_not_found_tracks += 1
             else:
-                self._logger.info("Copying track: %s", track.title)
+                self._logger.info("Copying track %s/%s: %s", track_index + 1, tracks_len, track.title)
                 self._logger.debug("Copying track details: %s", track.title)
                 try:
                     output_file_abs_path: str
@@ -88,7 +94,7 @@ class PlaylistToAlbumExporter:
                         output_file_abs_path = os.path.join(self._config.output_directory, track.file_name)
 
                     shutil.copy2(track.abs_file_path, output_file_abs_path)
-                    self._logger.info("Track copy done: %s", track.title)
+                    self._logger.info("Track copy done.")
                     self._stats.exported_tracks +=1
 
                 except Exception as e:
