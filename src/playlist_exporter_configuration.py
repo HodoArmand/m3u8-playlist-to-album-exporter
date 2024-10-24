@@ -141,6 +141,7 @@ class PlaylistExporterConfiguration:
     def get_args_parser() -> ArgumentParser:
         """ Get an argparse object for the CLI config input. """
 
+        # TODO: fill helper hints
         parser = argparse.ArgumentParser(prog=".m3u8 Album Exporter CLI utility", description='TODO: fill this')
         parser.add_argument('-yaml', '--yaml_file_path', help='TODO: fill this')
         parser.add_argument('-an', '--album_name', help='TODO: fill this')

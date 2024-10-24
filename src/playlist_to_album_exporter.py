@@ -3,99 +3,55 @@
 import logging
 import os.path
 import shutil
-from pathlib import PosixPath, WindowsPath
-from typing import NamedTuple
-from urllib.parse import unquote
-
-import m3u8
 
 from playlist_exporter_configuration import PlaylistExporterConfiguration
+from exporter_stats import ExporterStats
+from playlist_parser import PlaylistParser
+from track import Track
 
-class Track(NamedTuple):
-    """ Soundtrack descriptor tuple. """
-    abs_file_path: str|PosixPath|WindowsPath
-    file_name: str
-    order: int
-    title: str
-    duration: int
-
-    def __str__(self):
-        return "[\nabs_file_path:"+str(self.abs_file_path)+\
-            "\nfile_name:"+self.file_name+\
-            "\norder:"+str(self.order)+\
-            "\ntitle:"+self.title+\
-            "\nduration:"+str(self.duration)+"\n]"
 
 class PlaylistToAlbumExporter:
     """ Main class of the .m3u8 playlist file to album exporter. """
 
     _logger: logging.Logger = None
     _config: PlaylistExporterConfiguration = None
+    _stats: ExporterStats = None
+    _playlist_parser: PlaylistParser = None
+    _export_enabled: bool = False
     _tracks: list[Track] = []
 
     def __init__(self, config: PlaylistExporterConfiguration):
         self._logger = logging.getLogger("PlaylistToAlbumExporter")
         self._config = config
+        self._stats = ExporterStats()
+        self._playlist_parser = PlaylistParser(self._config.playlist_file_path)
 
-    def __str__(self):
-        raise NotImplementedError
-        # TODO: this
+    def parse_playlist(self) -> bool:
+        """ Parse the playlist, enable export if successful. """
 
-    def print_preview(self):
-        """ Print the preview of the export operation with the current configuration. """
-        raise NotImplementedError
-        # TODO: this
-
-    def export_album(self) -> bool:
-        """ Export the loaded tracks as a new album to the target directory. """
-        if not self._parse_playlist():
+        self._logger.info("Parsing playlist...")
+        if not self._playlist_parser.parse_playlist():
             self._logger.error("Playlist failed to load, export disabled, exiting. ")
 
             return False
 
-        self._logger.info("Exporting Album...")
-
-        self._copy_and_set_metadata()
+        self._logger.info("Parsing successful.")
+        self._stats += self._playlist_parser.get_stats()
+        self._export_enabled = True
 
         return True
 
-    def _parse_playlist(self) -> bool:
-        """ Parse the .m3u8 playlist for tracks and tracknumbers. """
+    def export_album(self) -> bool:
+        """ Export the loaded tracks as a new album to the target directory. """
 
-        self._logger.info("Loading .m3u8 playlist from file...")
-
-        playlist_absolute_filepath: str|PosixPath|WindowsPath = "file:///"+os.path.abspath(self._config.playlist_file_path)
-        self._logger.debug("playlist_absolute_filepath: %s", playlist_absolute_filepath)
-        playlist: m3u8.M3U8
-
-        try:
-            playlist = m3u8.load(playlist_absolute_filepath)
-        except Exception as e:
-            self._logger.error("Playlist failed to load: %s",e)
+        if not self._export_enabled:
+            self._logger.error("Album export is disabled. Successfully parse a playlist first.")
 
             return False
 
-        self._logger.debug("Loaded playlist content: %s", playlist.dumps())
-
-        for track_index, segment in enumerate(playlist.segments):
-            track_uri: str = str(segment.uri)
-            if not track_uri.startswith("file:///"):
-                self._logger.info("Unsupported track uri. Skipping:\n -Track: %s \n -uri: %s, ",
-                                  segment.title,
-                                  track_uri)
-            else:
-                abs_file_path = unquote(track_uri.replace("file:///", "", 1))
-                self._tracks.append(
-                    Track(
-                        abs_file_path=abs_file_path,
-                        file_name=os.path.basename(abs_file_path),
-                        order=track_index+1,
-                        title=segment.title,
-                        duration=segment.duration
-                    )
-                )
-
-        self._logger.debug("Loaded tracks: %s", self._tracks)
+        self._logger.info("Exporting Album...")
+        self._copy_and_set_metadata()
+        self._logger.info("Export finished, statistics: %s", self._stats)
 
         return True
 
@@ -115,12 +71,12 @@ class PlaylistToAlbumExporter:
 
         # TODO: parallelize this
         # TODO: add metadata setters
-        # TODO: add stats, print it (total loaded, ok, skipped, errored, etc.)
-        for track in self._tracks:
+        for track in self._playlist_parser.get_tracks():
             if not os.path.isfile(track.abs_file_path):
                 self._logger.error("Track file not found. Skipping:\n -Track: %s \n -uri: %s, ",
                                   track.title,
                                   track.abs_file_path)
+                self._stats.file_not_found_tracks += 1
             else:
                 self._logger.info("Copying track: %s", track.title)
                 self._logger.debug("Copying track details: %s", track.title)
@@ -132,8 +88,8 @@ class PlaylistToAlbumExporter:
                         output_file_abs_path = os.path.join(self._config.output_directory, track.file_name)
 
                     shutil.copy2(track.abs_file_path, output_file_abs_path)
-
                     self._logger.info("Track copy done: %s", track.title)
+                    self._stats.exported_tracks +=1
 
                 except Exception as e:
                     self._logger.error("Error when copying track '%s', error:%s", track.title, e)

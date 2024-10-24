@@ -31,13 +31,16 @@ def run_cli() -> int:
         exporter_config.load_argparse_namespace(args)
 
     if not exporter_config.is_loaded():
-        logger.error("Configuration failed to load.")
+        logger.critical("Configuration failed to load.")
 
         return 1
 
     logger.info("Configuration: %s", exporter_config)
 
     exporter = PlaylistToAlbumExporter(exporter_config)
+    if not exporter.parse_playlist():
+        return 1
+
     if not exporter.export_album():
         return 1
 
