@@ -9,6 +9,7 @@ from typing import NamedTuple
 import yaml
 from cerberus import Validator
 
+from utility.str_to_bool import str_to_bool
 from utility.get_filename_without_extension import get_filename_without_extension
 
 
@@ -106,6 +107,7 @@ class PlaylistExporterConfiguration:
             if config["output_directory"] is None and config["album_name"] is not None:
                 config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
 
+            # TODO: This is hacky, investigate and clean it up.
             config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] \
                 if config["add_ordering_prefix_to_filename"] is not None else True
 
@@ -141,13 +143,19 @@ class PlaylistExporterConfiguration:
     def get_args_parser() -> ArgumentParser:
         """ Get an argparse object for the CLI config input. """
 
-        # TODO: fill helper hints
-        parser = argparse.ArgumentParser(prog=".m3u8 Album Exporter CLI utility", description='TODO: fill this')
-        parser.add_argument('-yaml', '--yaml_file_path', help='TODO: fill this')
-        parser.add_argument('-an', '--album_name', help='TODO: fill this')
-        parser.add_argument('-pf', '--playlist_file_path', help='TODO: fill this')
-        parser.add_argument('-out', '--output_directory', help='TODO: fill this')
-        parser.add_argument('-opf', '--add_ordering_prefix_to_filename', help='TODO: fill this')
+        parser = argparse.ArgumentParser(prog=".m3u8 Album Exporter CLI utility",
+                                         description="""A simple application to export tracks
+                                          from an .m3u8 playlist file to a new folder as named album, with playlist ordering of the songs.""")
+        parser.add_argument('-yaml', '--yaml_file_path', help='Absolute path of the .yaml config file.')
+        parser.add_argument('-an', '--album_name', help='Name of the album.')
+        parser.add_argument('-pf', '--playlist_file_path', help='Absolute path of the .m3u8 playlist file.')
+        parser.add_argument('-out', '--output_directory', help='Absolute path of the export output directory.')
+        # TODO: this is hacky, investigate and clean up.
+        parser.add_argument('-opf', '--add_ordering_prefix_to_filename',
+                            type=str_to_bool,
+                            nargs='?',  # Accepts an optional argument
+                            const=True,  # Default to True if no value is provided
+                            help='Enable/Disable automatic track # prefix function. Enabled by default.')
         parser.add_argument('-d', '--debug', action='store_true', help='Enable debug level logging.')
 
         return parser
