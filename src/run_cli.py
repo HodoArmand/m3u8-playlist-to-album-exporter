@@ -49,5 +49,3 @@ def run_cli() -> int:
 
 if __name__ == '__main__':
     run_cli()
-
-#     TODO: add windows cmd .bat script files too

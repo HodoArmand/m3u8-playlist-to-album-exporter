@@ -73,7 +73,6 @@ class PlaylistToAlbumExporter:
                                e)
 
         # TODO: parallelize this
-        # TODO: add metadata setters
 
         tracks: list[Track] = self._playlist_parser.get_tracks()
         tracks_len: int = len(tracks)
