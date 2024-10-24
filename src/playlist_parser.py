@@ -27,7 +27,7 @@ class PlaylistParser:
     def parse_playlist(self) -> bool:
         """ Parse the .m3u8 playlist for tracks and tracknumbers. """
 
-        self._logger.info("Loading .m3u8 playlist from file...")
+        self._logger.debug("Loading .m3u8 playlist from file...")
         self._stats.reset()
 
         playlist_absolute_file_uri: str|PosixPath|WindowsPath = "file:///"+os.path.abspath(self._playlist_file_path)
@@ -47,16 +47,16 @@ class PlaylistParser:
         for track_index, segment in enumerate(playlist.segments):
             track_uri: str = unquote(str(segment.uri))
             if not track_uri.startswith("file:///"):
-                self._logger.info("Unsupported track uri. Attempting path auto repair:\n -Track: %s \n -uri: %s",
+                self._logger.debug("Unsupported track uri. Attempting path auto repair:\n -Track: %s \n -uri: %s",
                                   segment.title,
                                   track_uri)
                 repaired_uri: str|bool = self._get_repaired_uri(track_uri)
                 if not repaired_uri:
-                    self._logger.error("Path auto repair failed, skipping track:\n -Track: %s \n -uri: %s",segment.title, track_uri)
+                    self._logger.error("Path auto repair failed, skipping track.")
                     self._stats.skipped_tracks +=1
 
                 else:
-                    self._logger.info("Path auto repair successful, new track uri:\n %s", repaired_uri)
+                    self._logger.debug("Path auto repair successful, new track uri:\n %s", repaired_uri)
                     segment.uri = repaired_uri
                     self._stats.repaired_uris += 1
 
