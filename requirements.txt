@@ -3,3 +3,4 @@ pylint
 cerberus
 m3u8
 coloredlogs
+mutagen

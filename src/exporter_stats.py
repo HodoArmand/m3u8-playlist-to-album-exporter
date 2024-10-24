@@ -1,6 +1,8 @@
 """ Dataclass to hold exporter statistics. """
 
 
+# Reason: Eight is reasonable in this case.
+# pylint: disable-next=too-many-instance-attributes
 class ExporterStats:
     """ Dataclass to hold exporter statistics. """
     total_segments: int = 0
@@ -9,6 +11,7 @@ class ExporterStats:
     loaded_tracks: int = 0
     file_not_found_tracks: int = 0
     copy_error_tracks: int = 0
+    file_media_metadata_errors: int = 0
     exported_tracks: int = 0
 
     def reset(self):
@@ -20,6 +23,7 @@ class ExporterStats:
         self.loaded_tracks = 0
         self.file_not_found_tracks = 0
         self.copy_error_tracks = 0
+        self.file_media_metadata_errors = 0
         self.exported_tracks = 0
 
     def __str__(self):
@@ -29,6 +33,7 @@ class ExporterStats:
             "\nloaded_tracks:"+str(self.loaded_tracks)+\
             "\nfile_not_found_tracks:"+str(self.file_not_found_tracks)+\
             "\ncopy_error_tracks:"+str(self.copy_error_tracks)+\
+            "\nfile_media_metadata_errors:"+str(self.copy_error_tracks)+\
             "\nexported_tracks:"+str(self.exported_tracks)+"\n]"
 
     def __add__(self, other):
@@ -40,6 +45,7 @@ class ExporterStats:
         summed_stats.loaded_tracks = self.loaded_tracks + other.loaded_tracks
         summed_stats.file_not_found_tracks = self.file_not_found_tracks + other.file_not_found_tracks
         summed_stats.copy_error_tracks = self.copy_error_tracks + other.copy_error_tracks
+        summed_stats.file_media_metadata_errors = self.file_media_metadata_errors + other.file_media_metadata_errors
         summed_stats.exported_tracks = self.exported_tracks + other.exported_tracks
 
         return summed_stats
