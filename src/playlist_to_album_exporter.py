@@ -73,8 +73,6 @@ class PlaylistToAlbumExporter:
                                self._config.output_directory,
                                e)
 
-        # TODO: parallelize this
-
         tracks: list[Track] = self._playlist_parser.get_tracks()
         tracks_len: int = len(tracks)
         for track_index, track in enumerate(tracks):

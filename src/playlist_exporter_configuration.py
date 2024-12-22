@@ -31,7 +31,6 @@ class PlaylistExporterConfiguration:
     playlist_file_path: str|None = None
     output_directory: str|None = None
     add_ordering_prefix_to_filename: bool|None = True
-    # TODO: add configurable Artist metadata prop setter value for album tracks.
 
     def __init__(self):
         self._logger = logging.getLogger("PlaylistExporterConfiguration")
@@ -107,7 +106,6 @@ class PlaylistExporterConfiguration:
             if config["output_directory"] is None and config["album_name"] is not None:
                 config["output_directory"] = os.path.join("output", os.path.abspath(config["album_name"]))
 
-            # TODO: This is hacky, investigate and clean it up.
             config["add_ordering_prefix_to_filename"] = config["add_ordering_prefix_to_filename"] \
                 if config["add_ordering_prefix_to_filename"] is not None else True
 
@@ -150,7 +148,6 @@ class PlaylistExporterConfiguration:
         parser.add_argument('-an', '--album_name', help='Name of the album.')
         parser.add_argument('-pf', '--playlist_file_path', help='Absolute path of the .m3u8 playlist file.')
         parser.add_argument('-out', '--output_directory', help='Absolute path of the export output directory.')
-        # TODO: this is hacky, investigate and clean up.
         parser.add_argument('-opf', '--add_ordering_prefix_to_filename',
                             type=str_to_bool,
                             nargs='?',  # Accepts an optional argument
