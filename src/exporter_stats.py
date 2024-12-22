@@ -1,10 +1,10 @@
 """ Dataclass to hold exporter statistics. """
 
-
 # Reason: Eight is reasonable in this case.
 # pylint: disable-next=too-many-instance-attributes
 class ExporterStats:
     """ Dataclass to hold exporter statistics. """
+
     total_segments: int = 0
     repaired_uris: int = 0
     skipped_tracks: int = 0
@@ -27,6 +27,7 @@ class ExporterStats:
         self.exported_tracks = 0
 
     def __str__(self):
+
         return "[\ntotal_segments:"+str(self.total_segments)+\
             "\npath_autorepaired_tracks:"+str(self.repaired_uris)+\
             "\nskipped_tracks:"+str(self.skipped_tracks)+\

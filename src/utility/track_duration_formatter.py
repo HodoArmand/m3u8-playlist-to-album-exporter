@@ -10,7 +10,7 @@ def format_duration(seconds: int) -> str:
         str: The formatted duration as a string in hh:mm:ss format.
     """
 
-    # Reason: Even if truly and int is passed to the function, apparently it is not int enough for python, typecast again.
+    # Reason: Even if truly an int is passed to the function, apparently it is not int enough for python, typecast again for correct behavior.
     seconds = int(seconds)
 
     hours = seconds // 3600

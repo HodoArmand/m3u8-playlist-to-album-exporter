@@ -81,9 +81,9 @@ class PlaylistToAlbumExporter:
             if not os.path.isfile(track.abs_file_path):
                 self._logger.error("Track %s/%s file not found. Skipping:\n -Track: %s \n -filepath: %s, ",
                                    track_index + 1,
-                                    tracks_len,
-                                    track.title,
-                                    track.abs_file_path)
+                                   tracks_len,
+                                   track.title,
+                                   track.abs_file_path)
                 self._stats.file_not_found_tracks += 1
             else:
                 self._logger.info("Exporting track %s/%s: %s | %s", track_index + 1,
@@ -96,15 +96,16 @@ class PlaylistToAlbumExporter:
                 if exported_track_file_abspath:
                     self._set_track_file_metadata(track.abs_file_path, track_index + 1)
 
-    def _copy_track(self, track_index: int, tracks_len: int, track: Track) -> str|bool:
-        """ Copy the track and rename if prefixing is enambled. """
+    def _copy_track(self, track_index: int, tracks_len: int, track: Track) -> str | bool:
+        """ Copy the track and rename if prefixing is enabled. """
 
         self._logger.debug("Copying track %s/%s: %s", track_index + 1, tracks_len, track.title)
         self._logger.debug("Copying track details: %s", track.title)
         try:
             output_file_abs_path: str
             if self._config.add_ordering_prefix_to_filename:
-                output_file_abs_path = os.path.join(self._config.output_directory, str(track.order) + " - " + track.file_name)
+                track_file_name: str = self._format_track_number_with_zero_padding(track.order, tracks_len) + " - " + track.file_name
+                output_file_abs_path = os.path.join(self._config.output_directory, track_file_name)
             else:
                 output_file_abs_path = os.path.join(self._config.output_directory, track.file_name)
 
@@ -119,7 +120,7 @@ class PlaylistToAlbumExporter:
 
         return output_file_abs_path
 
-    def _set_track_file_metadata(self, file_abs_path: str|PosixPath|WindowsPath, track_order: int):
+    def _set_track_file_metadata(self, file_abs_path: str | PosixPath | WindowsPath, track_order: int):
         """ Set track file media metadata. """
 
         self._logger.debug("Setting media file metadata...")
@@ -131,3 +132,12 @@ class PlaylistToAlbumExporter:
         except Exception as e:
             self._logger.error("Media file metadata setting error: %s", e)
             self._stats.file_media_metadata_errors += 1
+
+    @staticmethod
+    def _format_track_number_with_zero_padding(track_number: int, tracks_len: int) -> str:
+        """Format the track number with zero-padding based on the total number of tracks."""
+
+        num_digits = len(str(tracks_len))
+        zero_padded_track_number: str = str(track_number).zfill(num_digits)
+
+        return zero_padded_track_number

@@ -1,6 +1,6 @@
 """ String to bool converter for CLi args. """
-import argparse
 
+import argparse
 
 def str_to_bool(v):
     """ String to bool converter for CLi args. """
