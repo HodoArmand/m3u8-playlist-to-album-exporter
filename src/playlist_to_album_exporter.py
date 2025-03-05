@@ -2,6 +2,7 @@
 
 import logging
 import os.path
+import re
 import shutil
 from pathlib import PosixPath, WindowsPath
 
@@ -102,7 +103,8 @@ class PlaylistToAlbumExporter:
         try:
             output_file_abs_path: str
             if self._config.add_ordering_prefix_to_filename:
-                track_file_name: str = self._format_track_number_with_zero_padding(track.order, tracks_len) + " - " + track.file_name
+                cleaned_track_name = self._strip_numeric_prefix(track.file_name)
+                track_file_name: str = self._format_track_number_with_zero_padding(track.order, tracks_len) + " - " + cleaned_track_name
                 output_file_abs_path = os.path.join(self._config.output_directory, track_file_name)
             else:
                 output_file_abs_path = os.path.join(self._config.output_directory, track.file_name)
@@ -139,3 +141,14 @@ class PlaylistToAlbumExporter:
         zero_padded_track_number: str = str(track_number).zfill(num_digits)
 
         return zero_padded_track_number
+
+    @staticmethod
+    def _strip_numeric_prefix(filename: str) -> str:
+        """
+        Removes a leading numeric prefix from the filename.
+        A numeric prefix is defined as one or more digits followed by a hyphen and space.
+        """
+
+        pattern = r'^\d+ - '
+
+        return re.sub(pattern, '', filename)
