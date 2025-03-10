@@ -1,9 +1,33 @@
+
 # M3U8 Playlist to Album Exporter
 
 
 A simple commandline application to export music tracks from an .m3u8 playlist file to a new folder as named album, with playlist ordering of the songs.
 
 Transform your favorite music playlists into neatly organized albums with this tool, perfect for devices like smartphones, car systems, or home audio setups.
+
+## Table of Contents:
+
+<!-- TOC -->
+* [M3U8 Playlist to Album Exporter](#m3u8-playlist-to-album-exporter)
+  * [Example usage](#example-usage)
+    * [Step 1.: Create a .m3u8 playlist](#step-1-create-a-m3u8-playlist)
+    * [Step 2.: Configuration](#step-2-configuration-)
+    * [Step 3.: Run the exporter](#step-3-run-the-exporter)
+  * [Installation](#installation)
+    * [Step 1.: Requirements](#step-1-requirements)
+    * [Step 2.: Virtual python Environment](#step-2-virtual-python-environment)
+  * [Configuration](#configuration)
+    * [Yaml file path `-yaml/--yaml_file_path`](#yaml-file-path--yaml--yaml_file_path)
+    * [Album Name `-an/--album_name`](#album-name--an--album_name-)
+    * [Playlist File Path `-pf/--playlist_file_path`](#playlist-file-path--pf--playlist_file_path-)
+    * [Output Directory `-out/--output_directory`](#output-directory--out--output_directory-)
+    * [Add Ordering Prefix To Filename `-opf/--add_ordering_prefix_to_filename`](#add-ordering-prefix-to-filename--opf--add_ordering_prefix_to_filename-)
+    * [Debug Mode `-d/--debug`](#debug-mode--d--debug-)
+  * [Metadata setter supported music file formats](#metadata-setter-supported-music-file-formats)
+  * [Troubleshooting](#troubleshooting)
+  * [License](#license)
+<!-- TOC -->
 
 ## Example usage
 
