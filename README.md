@@ -13,7 +13,7 @@ After running the exporter, your music files will be organized in the specified 
 
 Use [VLC](https://www.videolan.org/vlc/) for example to create a .m3u8 playlist file, that may contain many tracks from multiple artists, albums and folders.
 
-![demo_image_1](https://github.com/HodoArmand/m3u8-playlist-to-album-exporter/blob/main/documentation/demo_screenshots/demo1_make_playlist_file.gif)
+<img src="https://github.com/HodoArmand/m3u8-playlist-to-album-exporter/blob/main/documentation/demo_screenshots/demo1_make_playlist_file.gif" alt="demo_image_1" loop=infinite>
 
 ### Step 2.: Configuration   
 
