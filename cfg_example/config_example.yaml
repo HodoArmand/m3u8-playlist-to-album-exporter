@@ -1,5 +1,5 @@
 # Example configuration file
 album_name: "My fire mixtape."
 playlist_file_path: "C:/Users/DJMaestro/Mixtapes/fire.m3u8"
-output_directory: "C:/Users/DJMaestro/Mixtape_albums/fire"
+output_directory: "C:/Users/DJMaestro/Mixtape_albums/Fire"
 add_ordering_prefix_to_filename: True
